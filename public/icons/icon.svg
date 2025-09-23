@@ -1,0 +1,23 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 背景 -->
+  <rect width="512" height="512" rx="64" fill="#2563eb"/>
+  
+  <!-- 簡化的 Logo 設計 - 基於您的 cold_logo_bw.bmp -->
+  <g transform="translate(64, 64)">
+    <rect x="0" y="0" width="384" height="384" rx="32" fill="white"/>
+    
+    <!-- Logo 內容區域 -->
+    <g transform="translate(48, 48)">
+      <!-- 模擬您 Logo 的主要元素 -->
+      <circle cx="144" cy="100" r="60" fill="#2563eb" stroke="#1e40af" stroke-width="3"/>
+      
+      <!-- 文字或圖形元素 -->
+      <rect x="64" y="180" width="160" height="24" rx="12" fill="#2563eb"/>
+      <rect x="84" y="220" width="120" height="16" rx="8" fill="#3b82f6"/>
+      <rect x="104" y="250" width="80" height="12" rx="6" fill="#60a5fa"/>
+    </g>
+  </g>
+  
+  <!-- 企業請假系統標識 -->
+  <text x="256" y="450" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="24" font-weight="bold">請假系統</text>
+</svg>

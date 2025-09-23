@@ -1,0 +1,40 @@
+<svg width="750" height="1334" viewBox="0 0 750 1334" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 手機背景 -->
+  <rect width="750" height="1334" fill="#f8fafc"/>
+  
+  <!-- 狀態欄 -->
+  <rect x="0" y="0" width="750" height="60" fill="#000000"/>
+  <text x="30" y="40" fill="white" font-family="Arial, sans-serif" font-size="16">9:41</text>
+  <text x="680" y="40" fill="white" font-family="Arial, sans-serif" font-size="16">100%</text>
+  
+  <!-- 導航欄 -->
+  <rect x="0" y="60" width="750" height="80" fill="#2563eb"/>
+  <text x="375" y="110" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="20" font-weight="bold">請假系統</text>
+  
+  <!-- 主要內容 -->
+  <rect x="20" y="180" width="710" height="1000" rx="12" fill="white"/>
+  
+  <!-- 表單標題 -->
+  <text x="50" y="240" fill="#1f2937" font-family="Arial, sans-serif" font-size="24" font-weight="bold">新增請假申請</text>
+  
+  <!-- 表單字段 -->
+  <rect x="50" y="280" width="650" height="50" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="70" y="310" fill="#64748b" font-family="Arial, sans-serif" font-size="16">請假類型</text>
+  
+  <rect x="50" y="350" width="650" height="50" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="70" y="380" fill="#64748b" font-family="Arial, sans-serif" font-size="16">開始日期</text>
+  
+  <rect x="50" y="420" width="650" height="50" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="70" y="450" fill="#64748b" font-family="Arial, sans-serif" font-size="16">結束日期</text>
+  
+  <rect x="50" y="490" width="650" height="100" rx="8" fill="#f1f5f9" stroke="#cbd5e1"/>
+  <text x="70" y="520" fill="#64748b" font-family="Arial, sans-serif" font-size="16">請假事由</text>
+  
+  <!-- 提交按鈕 -->
+  <rect x="50" y="620" width="650" height="50" rx="8" fill="#2563eb"/>
+  <text x="375" y="650" text-anchor="middle" fill="white" font-family="Arial, sans-serif" font-size="18" font-weight="bold">提交申請</text>
+  
+  <!-- 底部圖標 -->
+  <circle cx="375" cy="800" r="60" fill="#2563eb" opacity="0.1"/>
+  <text x="375" y="810" text-anchor="middle" font-size="40">📱</text>
+</svg>
