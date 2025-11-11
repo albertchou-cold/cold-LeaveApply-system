@@ -17,7 +17,24 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { userId, password } = body;
 
-    const memberIdCheck: string = userId.padStart(3, '0');
+    // 缺少資料庫連線字串時，避免嘗試連線到 127.0.0.1:5432（Vercel 會失敗）
+    if (!process.env.DATABASE_URL) {
+      const response: AuthResponse = {
+        success: false,
+        message: '伺服器未設定資料庫連線，請聯絡管理員設定 DATABASE_URL 後再試',
+        error: 'Missing DATABASE_URL in server environment'
+      };
+      return NextResponse.json(response, { status: 500 });
+    }
+
+    // 合理標準化：純數字則補零至 3 位；其他（含字母）僅做 trim
+    let memberIdCheck: string;
+    const trimmed = (userId || '').trim();
+    if (/^\d+$/.test(trimmed)) {
+      memberIdCheck = trimmed.padStart(3, '0');
+    } else {
+      memberIdCheck = trimmed; // 不強制大小寫轉換，避免與註冊時大小寫不一致
+    }
 
     // 簡單的驗證
     if (!userId || !password) {
@@ -30,7 +47,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 驗證使用者 (使用 employeeId 作為 username 來查詢)
-    const user = await userDB.authenticateUser(memberIdCheck, password);
+  const user = await userDB.authenticateUser(memberIdCheck, password);
 
     if (!user) {
       const response: AuthResponse = {

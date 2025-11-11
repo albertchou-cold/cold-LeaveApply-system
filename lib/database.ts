@@ -5,9 +5,14 @@ import bcrypt from 'bcryptjs';
 import schedule from 'node-schedule';
 
 // 連接到 Neon.tech PostgreSQL 資料庫
+if (!process.env.DATABASE_URL) {
+  // 顯式提醒：在無 DATABASE_URL 時，pg 會預設嘗試連 127.0.0.1:5432
+  console.error('ENV ERROR: DATABASE_URL is not set. The app may try to connect to 127.0.0.1:5432 and fail on Vercel.');
+}
+
 export const db = new Pool({
-    connectionString: process.env.DATABASE_URL, 
-    ssl: { rejectUnauthorized: false }
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
 });
 
 // 初始化資料庫表格（啟動時執行一次）
@@ -396,14 +401,18 @@ export const userDB = {
   // 註冊新使用者
   createUser: async (userData: UserRegistrationRequest): Promise<User | null> => {
     try {
-      // 檢查使用者名稱和員工編號是否已存在
-      const existingUser = await db.query(
-        'SELECT employee_id FROM users WHERE email = $1',
-        [ userData.email]
+      // 檢查電子郵件或員工編號是否已存在（任何一個重複都不可註冊）
+      const duplicateCheck = await db.query(
+        'SELECT id FROM users WHERE email = $1 OR employee_id = $2',
+        [userData.email, userData.employeeId]
       );
 
-      if (existingUser.rows.length > 0) {
-        throw new Error('使用者名稱、電子郵件或員工編號已存在');
+      if (duplicateCheck.rows.length > 0) {
+        console.warn('⚠️ 嘗試建立已存在的使用者', {
+          email: userData.email,
+          employeeId: userData.employeeId
+        });
+        return null; // 讓上層決定回應（409 Conflict）
       }
 
       // 加密密碼
@@ -436,8 +445,13 @@ export const userDB = {
         ...row,
         role: row.role as UserRole
       };
-    } catch (error) {
-      console.error('建立使用者失敗:', error);
+    } catch (error: unknown) {
+      // 對常見的唯一性違反錯誤做更明確的日志標記
+      if (error instanceof Error && /duplicate key value violates unique constraint/i.test(error.message)) {
+        console.error('❌ 資料庫唯一性約束錯誤 (email 或 employee_id 重複):', error.message);
+        return null;
+      }
+      console.error('建立使用者失敗 (可能是資料庫連線或其他問題):', error);
       return null;
     }
   },

@@ -25,9 +25,7 @@ export async function POST(request: NextRequest) {
       normalizedEmployeeId = normalizedEmployeeId.padStart(3, '0');
     }
 
-    if (
-      // !email ||
-       !password || !fullName || !employeeId || !department || !role) {
+    if (!email || !password || !fullName || !employeeId || !department || !role) {
       const response: AuthResponse = {
         success: false,
         message: '所有欄位都是必填的',
@@ -60,6 +58,26 @@ export async function POST(request: NextRequest) {
     // 前端已經處理過員工編號標準化，直接使用傳入的值
     console.log('使用的員工編號:', normalizedEmployeeId);
 
+    // 重複性預檢（避免資料庫錯誤時直接誤判）
+    const existingByEmail = await userDB.getUserByEmail(email);
+    if (existingByEmail) {
+      const response: AuthResponse = {
+        success: false,
+        message: `電子郵件 ${email} 已被使用，請改用其他電子郵件`,
+        error: '電子郵件已存在'
+      };
+      return NextResponse.json(response, { status: 409 });
+    }
+    const existingByEmployee = await userDB.getUserByEmployeeId(normalizedEmployeeId);
+    if (existingByEmployee) {
+      const response: AuthResponse = {
+        success: false,
+        message: `員工編號 ${normalizedEmployeeId} 已存在，請使用不同的員工編號`,
+        error: '員工編號已存在'
+      };
+      return NextResponse.json(response, { status: 409 });
+    }
+
     // 建立新使用者
     const newUser = await userDB.createUser({
       email,
@@ -73,8 +91,8 @@ export async function POST(request: NextRequest) {
     if (!newUser) {
       const response: AuthResponse = {
         success: false,
-        message: `註冊失敗，員工編號 ${employeeId} 可能已存在，請使用不同的員工編號`,
-        error: '使用者建立失敗 - 可能是重複的員工編號'
+        message: `註冊失敗，可能是資料庫連線問題或唯一性衝突（email/員工編號）。請稍後再試。`,
+        error: '使用者建立失敗'
       };
       return NextResponse.json(response, { status: 409 });
     }
