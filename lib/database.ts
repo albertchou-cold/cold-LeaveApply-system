@@ -398,8 +398,8 @@ export const userDB = {
     try {
       // 檢查使用者名稱和員工編號是否已存在
       const existingUser = await db.query(
-        'SELECT id FROM users WHERE email = $1 OR employee_id = $2',
-        [ userData.email, userData.employeeId]
+        'SELECT employee_id FROM users WHERE email = $1',
+        [ userData.email]
       );
 
       if (existingUser.rows.length > 0) {
