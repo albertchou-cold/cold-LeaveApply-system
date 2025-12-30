@@ -3,8 +3,11 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   // Enable experimental features for better PWA support
   experimental: {
-    optimizePackageImports: ['@heroicons/react']
-  }
+    optimizePackageImports: ['@heroicons/react'],
+  },
+  webpack: (config) => {
+    return config;
+  },
 };
 
 const withPWA = require('next-pwa')({
