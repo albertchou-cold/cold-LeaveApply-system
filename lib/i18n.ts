@@ -134,6 +134,8 @@ const resources = {
         "proveLink": "請假證明連結",
         "approvedAt": "核准時間",
         "approvedBy": "核准人",
+        "dataalive" : "超過3天的資料僅能在內部系統頁面查看"
+
         
       },
       
@@ -347,7 +349,8 @@ const resources = {
         "leaveReason": "Leave Reason",
         "proveLink": "Leave Proof Link",
         "approvedAt": "Approved At",
-        "approvedBy": "Approved By"
+        "approvedBy": "Approved By",
+        "dataalive" : "Data over 3 days can only be viewed on the internal system page"
         
       },
       

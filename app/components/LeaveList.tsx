@@ -78,7 +78,7 @@ export default function LeaveList({
 
   return (
     <div className="space-y-4">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">{t('leaveApplyList.applyList')}</h2>
+      <div className="mb-4 text-red-600 font-semibold text-xs mb-6 text-center">{t('leaveApplyList.dataalive')}</div>
 
       {applications.map((application) => (
         <div key={application.id} className="bg-white p-6 rounded-lg shadow-md border">
