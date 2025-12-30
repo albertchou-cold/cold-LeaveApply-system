@@ -126,12 +126,10 @@ export default function LeaveList({
             </div>
           </div>
           
-            {application.status === LeaveStatus.PENDING && application.rejectedAt && (
+            {application.status === LeaveStatus.PENDING && (
               <button 
               className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
-              onClick={() => {
-                handleReject(application.id);
-              }}
+              onClick={() => {handleReject(application.id);}}
             >
             {t('cancel')}
           </button>
