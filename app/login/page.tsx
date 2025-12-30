@@ -66,12 +66,12 @@ export default function LoginPage() {
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {t('auth.loginTitle')}
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        {/* <p className="mt-2 text-center text-sm text-gray-600">
           {t("accountYet")}{' '}
           <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
             {t('auth.register')}
           </Link>
-        </p>
+        </p> */}
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">

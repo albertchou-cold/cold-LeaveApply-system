@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { email, password, fullName, employeeId, department, role } = body;
+    const { email, password, fullName, employeeId, authposition , positionarea, role } = body;
 
-    console.log('後端收到的數據:', { email, password: '***', fullName, employeeId, department, role });
+    console.log('後端收到的數據:', { email, password: '***', fullName, employeeId, authposition, positionarea, role });
 
 
     let normalizedEmployeeId = employeeId;
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       normalizedEmployeeId = normalizedEmployeeId.padStart(3, '0');
     }
 
-    if (!email || !password || !fullName || !employeeId || !department || !role) {
+    if (!password || !fullName || !employeeId || !authposition || !positionarea || !role) {
       const response: AuthResponse = {
         success: false,
         message: '所有欄位都是必填的',
@@ -45,29 +45,20 @@ export async function POST(request: NextRequest) {
     }
 
     // 電子郵件格式驗證
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      const response: AuthResponse = {
-        success: false,
-        message: '請輸入有效的電子郵件地址',
-        error: '電子郵件格式無效'
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
+    // const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // if (!emailRegex.test(email)) {
+    //   const response: AuthResponse = {
+    //     success: false,
+    //     message: '請輸入有效的電子郵件地址',
+    //     error: '電子郵件格式無效'
+    //   };
+    //   return NextResponse.json(response, { status: 400 });
+    // }
 
     // 前端已經處理過員工編號標準化，直接使用傳入的值
     console.log('使用的員工編號:', normalizedEmployeeId);
 
     // 重複性預檢（避免資料庫錯誤時直接誤判）
-    const existingByEmail = await userDB.getUserByEmail(email);
-    if (existingByEmail) {
-      const response: AuthResponse = {
-        success: false,
-        message: `電子郵件 ${email} 已被使用，請改用其他電子郵件`,
-        error: '電子郵件已存在'
-      };
-      return NextResponse.json(response, { status: 409 });
-    }
     const existingByEmployee = await userDB.getUserByEmployeeId(normalizedEmployeeId);
     if (existingByEmployee) {
       const response: AuthResponse = {
@@ -84,7 +75,8 @@ export async function POST(request: NextRequest) {
       password,
       fullName, 
       employeeId: normalizedEmployeeId,
-      department,
+      authposition,
+      positionarea,
       role,
     });
 
@@ -102,7 +94,8 @@ export async function POST(request: NextRequest) {
       id: newUser.id,
       fullName: newUser.fullName,
       employeeId: newUser.employeeId,
-      department: newUser.department,
+      authposition: newUser.authposition,
+      positionarea: newUser.positionarea,
       role: newUser.role
     });
 

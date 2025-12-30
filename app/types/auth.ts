@@ -3,7 +3,9 @@ export interface User {
   email: string;
   fullName: string;
   employeeId: string;
-  department: string;
+  authposition: Array<string>;
+  positionarea: Array<string>;
+  // department: string;
   role: UserRole;
   createdAt: string;
   lastLoginAt?: string;
@@ -16,11 +18,13 @@ export enum UserRole {
 }
 
 export interface UserRegistrationRequest {
-  email: string;
+  email?: string;
   password: string;
   fullName: string;
   employeeId: string;
-  department: string;
+  positionarea: Array<string>;
+  authposition: Array<string>;
+  // department: string;
   role: UserRole;
 }
 
@@ -41,6 +45,8 @@ export interface SessionUser {
   id: string;
   fullName: string;
   employeeId: string;
-  department: string;
+  authposition: Array<string>;
+  positionarea: Array<string>;
+  // department: string;
   role: UserRole;
 }

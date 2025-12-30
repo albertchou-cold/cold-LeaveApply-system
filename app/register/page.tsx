@@ -14,7 +14,9 @@ export default function RegisterPage() {
     password: '',
     fullName: '',
     employeeId: '',
-    department: '',
+    authposition: [],
+    positionarea: [],
+    // department: '',
     role: UserRole.EMPLOYEE,
   });
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -268,10 +270,10 @@ const departments = [
                 部門 *
               </label>
               <select
-                id="department"
-                name="department"
+                id="authposition"
+                name="authposition"
                 required
-                value={formData.department}
+                value={formData.authposition}
                 onChange={handleInputChange}
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >

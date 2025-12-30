@@ -63,7 +63,8 @@ export async function POST(request: NextRequest) {
       id: user.id,
       fullName: user.fullName,
       employeeId: user.employeeId,
-      department: user.department,
+      authposition: user.authposition,
+      positionarea: user.positionarea,
       role: user.role
     });
 

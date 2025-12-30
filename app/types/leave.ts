@@ -1,3 +1,5 @@
+import { Json } from "twilio/lib/interfaces";
+
 export interface LeaveApplication {
   id: string;
   employeeId: string;
@@ -14,7 +16,8 @@ export interface LeaveApplication {
   rejectedBy?: string;
   rejectionReason?: string;
   applyFolderLink?: string;
-  department: string;
+  positionarea: Array<string>;
+  authposition: Array<string>;
   RandomUniqueId: string;
   is_synced: boolean;
 }
@@ -56,7 +59,8 @@ export enum LeaveStatus {
 export interface Employee {
   id: string;
   name: string;
-  department: string;
+  positionarea: Array<string>;
+  authposition: Array<string>;
   position: string;
   email: string;
 }
@@ -69,7 +73,8 @@ export interface LeaveApplicationRequest {
   endDate: string;
   reason: string;
   applyFolderLink?: string;
-  department: string;
+  positionarea: Array<string>;
+  authposition: Array<string>;
   RandomUniqueId?: string;
 }
 

@@ -12,7 +12,8 @@ export function generateToken(user: SessionUser): string {
       id: user.id,
       fullName: user.fullName,
       employeeId: user.employeeId,
-      department: user.department,
+      authposition: user.authposition,
+      positionarea: user.positionarea,
       role: user.role,
     },
     JWT_SECRET,
@@ -26,14 +27,16 @@ export function verifyToken(token: string): SessionUser | null {
       id: string;
       fullName: string;
       employeeId: string;
-      department: string;
+      authposition: string[];
+      positionarea: string[];
       role: UserRole;
     };
     return {
       id: decoded.id,
       fullName: decoded.fullName,
       employeeId: decoded.employeeId,
-      department: decoded.department,
+      authposition: decoded.authposition,
+      positionarea: decoded.positionarea,
       role: decoded.role,
     };
   } catch {

@@ -28,7 +28,8 @@ export default function LeaveForm({ onSubmit, loading }: LeaveFormProps) {
     endDate: getCurrentDateTime(),
     reason: '',
     applyFolderLink: '',
-    department: user?.department || ''
+    authposition: user?.authposition || [],
+    positionarea: user?.positionarea || []
   });
 
   const handleSubmit = (e: React.FormEvent) => {

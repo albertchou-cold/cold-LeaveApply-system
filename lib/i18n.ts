@@ -346,6 +346,8 @@ const resources = {
         "leavePeriod": "Leave Period",
         "leaveReason": "Leave Reason",
         "proveLink": "Leave Proof Link",
+        "approvedAt": "Approved At",
+        "approvedBy": "Approved By"
         
       },
       

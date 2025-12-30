@@ -34,12 +34,12 @@ export default function Home() {
               >
                 🔑 {t('homepage.login')}
               </Link>
-              <Link
+              {/* <Link
                 href="/register"
                 className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-medium py-3 px-6 rounded-md transition duration-200 text-center"
               >
                 📋 {t('homepage.register')}
-              </Link>
+              </Link> */}
             </div>
             
             {/* <div className="text-center pt-4">

@@ -28,7 +28,8 @@ export async function initializeDatabase() {
         password_hash VARCHAR(255) NOT NULL,
         full_name VARCHAR(100) NOT NULL,
         employee_id VARCHAR(50) UNIQUE NOT NULL,
-        department VARCHAR(100) NOT NULL,
+        positionarea JSONB NULL,  -- New column for 工作區域
+        authposition JSONB NULL,  -- New column for 所屬部門
         role VARCHAR(20) DEFAULT 'employee',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         last_login_at TIMESTAMP NULL , 
@@ -55,7 +56,8 @@ export async function initializeDatabase() {
         rejected_by VARCHAR(50) NULL,
         rejection_reason TEXT NULL,
         apply_folder_link TEXT NULL,
-        department VARCHAR(100) NOT NULL,
+        positionarea JSONB NULL,  -- New column for 工作區域
+        authposition JSONB NULL,  -- New column for 所屬部門
         RandomUniqueId VARCHAR(255) UNIQUE NOT NULL,
         is_synced BOOLEAN DEFAULT FALSE,
         synced_at TIMESTAMP NULL,
@@ -107,28 +109,6 @@ export async function initializeDatabase() {
       console.log('ℹ️ RandomUniqueId 欄位可能已存在或表格不存在:', error);
     }
     
-    // 檢查是否需要插入初始管理員使用者
-    const userCountResult = await db.query('SELECT COUNT(*) FROM users');
-    const userCount = parseInt(userCountResult.rows[0].count);
-    
-    if (userCount === 0) {
-      console.log('👤 建立初始管理員使用者...');
-      const hashedPassword = await bcrypt.hash('admin123', 10);
-      await db.query(`
-        INSERT INTO users (
-          email, 
-          password_hash, 
-          full_name, 
-          employee_id, 
-          department, 
-          role
-        ) VALUES 
-        ('admin@company.com', $1, '系統管理員', 'ADMIN001', '資訊部', 'admin'),
-        ('manager@company.com', $2, '人事經理', 'MANAGER001', '人事部', 'manager')
-      `, [hashedPassword, await bcrypt.hash('manager123', 10)]);
-      console.log('✅ 初始管理員使用者已建立');
-      console.log('📋 預設帳號：admin / admin123, manager / manager123');
-    }
     
     console.log('✅ 資料庫初始化完成');
   } catch (error) {
@@ -156,7 +136,8 @@ export const leaveDB = {
           rejected_at::text as "rejectedAt",
           rejected_by as "rejectedBy",
           apply_folder_link as "applyFolderLink",
-          department,
+          positionarea,
+          authposition,
           is_synced
         FROM leave_applications 
         ORDER BY applied_at DESC
@@ -178,7 +159,8 @@ export const leaveDB = {
         rejectedAt: (row.rejectedAt as string | null) || undefined,
         rejectedBy: (row.rejectedBy as string | null) || undefined,
         // rejectionReason: (row.rejectionReason as string | null) || undefined,
-        department: row.department as string,
+        positionarea: row.positionarea as Array<string>,
+        authposition: row.authposition as Array<string>,
         RandomUniqueId: row.RandomUniqueId as string,
         is_synced: row.is_synced as boolean
       }));
@@ -207,7 +189,8 @@ export const leaveDB = {
           rejected_at::text as "rejectedAt",
           rejected_by as "rejectedBy",
           apply_folder_link as "applyFolderLink",
-          department as "department"
+          positionarea,
+          authposition
         FROM leave_applications 
         WHERE id = $1
       `, [id]);
@@ -245,7 +228,8 @@ export const leaveDB = {
           rejected_at::text as "rejectedAt",
           rejected_by as "rejectedBy",
           apply_folder_link as "applyFolderLink",
-          department as "department",
+          positionarea as "positionarea",
+          authposition as "authposition",
           RandomUniqueId,
           is_synced
         FROM leave_applications 
@@ -269,7 +253,8 @@ export const leaveDB = {
         rejectedAt: (row.rejectedAt as string | null) || undefined,
         rejectedBy: (row.rejectedBy as string | null) || undefined,
         // rejectionReason: (row.rejectionReason as string | null) || undefined,
-        department: row.department as string,
+        authposition: row.authposition as Array<string>,
+        positionarea: row.positionarea as Array<string>,
         RandomUniqueId: row.RandomUniqueId as string,
         is_synced: row.is_synced as boolean
       }));
@@ -284,8 +269,8 @@ export const leaveDB = {
     try {
       const result = await db.query(`
         INSERT INTO leave_applications (
-          employee_id, employee_name, leave_type, start_date, end_date, reason, apply_folder_link, department, RandomUniqueId
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+          employee_id, employee_name, leave_type, start_date, end_date, reason, apply_folder_link, positionarea, authposition, RandomUniqueId
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING 
           id::text,
           employee_id as "employeeId",
@@ -301,7 +286,8 @@ export const leaveDB = {
           rejected_at::text as "rejectedAt",
           rejected_by as "rejectedBy",
           apply_folder_link as "applyFolderLink",
-          department as "department",
+          positionarea as "positionarea",
+          authposition as "authposition",
           RandomUniqueId,
           is_synced
       `, [
@@ -312,7 +298,8 @@ export const leaveDB = {
         application.endDate,
         application.reason,
         application.applyFolderLink,
-        application.department,
+        application.positionarea,
+        application.authposition,
         application.RandomUniqueId,
       ]);
       
@@ -421,14 +408,15 @@ export const userDB = {
       // 插入新使用者
       const result = await db.query(`
         INSERT INTO users (
-          email, password_hash, full_name, employee_id, department, role
-        ) VALUES ($1, $2, $3, $4, $5, $6)
+          email, password_hash, full_name, employee_id, positionarea, authposition, role
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING 
           id::text,
           email,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           created_at::text as "createdAt"
       `, [
@@ -436,7 +424,9 @@ export const userDB = {
         hashedPassword,
         userData.fullName,
         userData.employeeId,
-        userData.department,
+        userData.positionarea,
+        userData.authposition,
+        userData.positionarea,
         userData.role
       ]);
 
@@ -467,7 +457,8 @@ export const userDB = {
           password_hash,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           created_at::text as "createdAt",
           last_login_at::text as "lastLoginAt"
@@ -515,7 +506,8 @@ export const userDB = {
           email,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           created_at::text as "createdAt",
           last_login_at::text as "lastLoginAt"
@@ -545,7 +537,8 @@ export const userDB = {
           email,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           created_at::text as "createdAt",
           last_login_at::text as "lastLoginAt"
@@ -575,7 +568,8 @@ export const userDB = {
           email,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           created_at::text as "createdAt",
           last_login_at::text as "lastLoginAt"
@@ -588,7 +582,8 @@ export const userDB = {
         email: row.email as string,
         fullName: row.fullName as string,
         employeeId: row.employeeId as string,
-        department: row.department as string,
+        authposition: row.authposition as Array<string>,
+        positionarea: row.positionarea as Array<string>,
         role: row.role as UserRole,
         createdAt: row.createdAt as string,
         lastLoginAt: (row.lastLoginAt as string | null) || undefined
@@ -600,37 +595,37 @@ export const userDB = {
   },
 
   // 通過電子郵件獲取使用者
-  getUserByEmail: async (email: string): Promise<User | null> => {
-    try {
-      const result = await db.query(`
-        SELECT 
-          id::text,
-          email,
-          full_name as "fullName",
-          employee_id as "employeeId",
-          department,
-          role,
-          created_at::text as "createdAt",
-          last_login_at::text as "lastLoginAt"
-        FROM users 
-        WHERE email = $1
-      `, [email]);
+  // getUserByEmail: async (email: string): Promise<User | null> => {
+  //   try {
+  //     const result = await db.query(`
+  //       SELECT 
+  //         id::text,
+  //         email,
+  //         full_name as "fullName",
+  //         employee_id as "employeeId",
+  //         department,
+  //         role,
+  //         created_at::text as "createdAt",
+  //         last_login_at::text as "lastLoginAt"
+  //       FROM users 
+  //       WHERE email = $1
+  //     `, [email]);
 
-      if (result.rows.length === 0) {
-        return null;
-      }
+  //     if (result.rows.length === 0) {
+  //       return null;
+  //     }
 
-      const row = result.rows[0];
-      return {
-        ...row,
-        role: row.role as UserRole,
-        lastLoginAt: (row.lastLoginAt as string | null) || undefined
-      };
-    } catch (error) {
-      console.error('通過電子郵件獲取使用者失敗:', error);
-      return null;
-    }
-  },
+  //     const row = result.rows[0];
+  //     return {
+  //       ...row,
+  //       role: row.role as UserRole,
+  //       lastLoginAt: (row.lastLoginAt as string | null) || undefined
+  //     };
+  //   } catch (error) {
+  //     console.error('通過電子郵件獲取使用者失敗:', error);
+  //     return null;
+  //   }
+  // },
 
   // 通過手機號碼獲取使用者
   getUserByPhone: async (phoneNumber: string): Promise<User | null> => {
@@ -641,7 +636,8 @@ export const userDB = {
           email,
           full_name as "fullName",
           employee_id as "employeeId",
-          department,
+          authposition,
+          positionarea,
           role,
           phone_number as "phoneNumber",
           created_at::text as "createdAt",

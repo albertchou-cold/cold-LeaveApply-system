@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
     await initializeDatabase();
     
     const body = await request.json();
-    const { employeeId, employeeName, leaveType, startDate, endDate, reason , applyFolderLink, department } = body;
+    const { employeeId, employeeName, leaveType, startDate, endDate, reason , applyFolderLink, authposition, positionarea } = body;
 
     // 簡單的驗證
     if (!employeeId || !employeeName || !leaveType || !startDate || !endDate || !reason) {
@@ -73,7 +73,8 @@ export async function POST(request: NextRequest) {
       endDate,
       reason,
       applyFolderLink,
-      department,
+      authposition,
+      positionarea,
       RandomUniqueId: crypto.randomUUID() 
     });
 

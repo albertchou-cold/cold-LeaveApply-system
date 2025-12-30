@@ -99,7 +99,7 @@ export default function LeavePage() {
         body: JSON.stringify({
           status: LeaveStatus.REJECTED,
           managerId: user?.employeeId || '',
-          rejectionReason: reason,
+          rejectionReason: reason? reason : '自行銷假',
         }),
       });
 
@@ -152,7 +152,7 @@ export default function LeavePage() {
             >
               {t('titleLeave.checkLeave')}
             </button>
-            <button
+            {/* <button
               onClick={() => setActiveTab('manage')}
               className={`px-6 py-3 rounded-r-lg font-medium transition duration-200 
                 text-pretty
@@ -163,7 +163,7 @@ export default function LeavePage() {
               }`}
             >
               {t('titleLeave.manageLeaveApply')}
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -189,7 +189,7 @@ export default function LeavePage() {
           )}
           
           {/* 只有管理者可以管理他人的請假申請 */}
-          {activeTab === 'manage' && (
+          {/* {activeTab === 'manage' && (
             user && user.role !== "employee" ? (
               <div>
                 {
@@ -210,7 +210,7 @@ export default function LeavePage() {
                 {t('errors.unauthorized')}
               </div>
             )
-          )}
+          )} */}
         </div>
       </div>
     </div>

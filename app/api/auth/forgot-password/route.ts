@@ -18,14 +18,14 @@ export async function POST(request: NextRequest) {
     }
 
     // 檢查用戶是否存在
-    const user = await userDB.getUserByEmail(email);
-    if (!user) {
-      // 即使用戶不存在也返回成功訊息（安全考量）
-      return NextResponse.json({
-        success: true,
-        message: '如果該帳號存在，驗證碼已發送'
-      });
-    }
+    // const user = await userDB.getUserByEmail(email);
+    // if (!user) {
+    //   // 即使用戶不存在也返回成功訊息（安全考量）
+    //   return NextResponse.json({
+    //     success: true,
+    //     message: '如果該帳號存在，驗證碼已發送'
+    //   });
+    // }
 
     // 生成 6 位數驗證碼
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();

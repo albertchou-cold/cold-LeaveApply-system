@@ -14,7 +14,7 @@ export default function LeaveList({
   applications, 
   onApprove, 
   onReject, 
-  showActions = false 
+  showActions = false,
 }: LeaveListProps) {
   const { t } = useTranslation();
   
@@ -39,11 +39,34 @@ export default function LeaveList({
   };
 
   const handleReject = (id: string) => {
-    const reason = prompt('請輸入拒絕原因：');
-    if (reason && onReject) {
-      onReject(id, reason);
+    const confirmed = confirm("確認是否要銷假？");
+    if (confirmed) {
+      fetch(`/api/leave/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          status: '已取消',
+          rejectionReason: '自己銷假',
+        }),
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            alert('已成功銷假');
+            // 可根據需要刷新列表
+            window.location.reload();
+          } else {
+            alert('銷假失敗: ' + data.message);
+          }
+        })
+        .catch(err => {
+          alert('銷假失敗: ' + err);
+        });
     }
   };
+
 
   if (applications.length === 0) {
     return (
@@ -102,6 +125,20 @@ export default function LeaveList({
                 </a>
             </div>
           </div>
+          
+            {application.status === LeaveStatus.PENDING && application.rejectedAt && (
+              <button 
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
+              onClick={() => {
+                handleReject(application.id);
+              }}
+            >
+            {t('cancel')}
+          </button>
+            )
+          }
+            
+          
 
           {application.status === LeaveStatus.APPROVED && application.approvedAt && (
             <div className="mb-4 p-3 bg-green-50 rounded-md">
@@ -126,7 +163,7 @@ export default function LeaveList({
             </div>
           )}
 
-          {showActions && application.status === LeaveStatus.PENDING && (
+          {/* {showActions && application.status === LeaveStatus.PENDING && (
             <div className="flex space-x-2 pt-4 border-t">
               {onApprove && (
                 <button
@@ -141,11 +178,11 @@ export default function LeaveList({
                   onClick={() => handleReject(application.id)}
                   className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md text-sm font-medium transition duration-200"
                 >
-                  {t('reject')}
+                  {t('reject')} 
                 </button>
               )}
             </div>
-          )}
+          )} */}
 
           {/* {showActions && onDelete && (
             <div className="flex justify-end pt-2">
