@@ -15,7 +15,8 @@ export async function GET(request: NextRequest) {
     }
 
     // 過濾掉已同步的記錄
-    const filteredApplications = applications.filter(app => !app.is_synced);
+    // const filteredApplications = applications.filter(app => !app.is_synced);
+    const filteredApplications = applications;
 
     const response: LeaveApplicationResponse = {
       success: true,

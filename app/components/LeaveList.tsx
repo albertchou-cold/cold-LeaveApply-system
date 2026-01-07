@@ -2,6 +2,7 @@
 
 import { LeaveApplication, LeaveStatus } from '@/app/types/leave';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '@/app/contexts/AuthContext';
 
 interface LeaveListProps {
   applications: LeaveApplication[];
@@ -17,6 +18,7 @@ export default function LeaveList({
   showActions = false,
 }: LeaveListProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   
   const getStatusColor = (status: LeaveStatus) => {
     switch (status) {
@@ -126,15 +128,15 @@ export default function LeaveList({
             </div>
           </div>
           
-            {application.status === LeaveStatus.PENDING && (
-              <button 
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full"
-              onClick={() => {handleReject(application.id);}}
+          {application.status === LeaveStatus.PENDING && (
+            <button
+              className="bg-red-500 hover:bg-red-700 disabled:bg-red-300 disabled:cursor-not-allowed text-white font-bold py-2 px-4 rounded w-full"
+              onClick={() => { handleReject(application.id); }}
+              disabled={user?.employeeId !== application.employeeId}
             >
-            {t('cancel')}
-          </button>
-            )
-          }
+              {t('cancel')}
+            </button>
+          )}
             
           
 
