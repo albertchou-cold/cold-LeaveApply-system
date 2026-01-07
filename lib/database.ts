@@ -116,6 +116,47 @@ export async function initializeDatabase() {
   }
 }
 
+const normalizeStringArray = (input: unknown): string[] => {
+  if (Array.isArray(input)) {
+    return input.map(item => String(item).trim()).filter(Boolean);
+  }
+
+  if (typeof input === 'string') {
+    const trimmed = input.trim();
+    if (!trimmed) {
+      return [];
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (Array.isArray(parsed)) {
+        return parsed.map(item => String(item).trim()).filter(Boolean);
+      }
+    } catch {
+      // ignore JSON.parse errors and fallback to manual parsing
+    }
+
+    if (trimmed.startsWith('{') && trimmed.endsWith('}')) {
+      const inner = trimmed.slice(1, -1).trim();
+      if (!inner) {
+        return [];
+      }
+      return inner
+        .split(',')
+        .map(item => item.trim().replace(/^"|"$/g, ''))
+        .filter(Boolean);
+    }
+
+    return [trimmed];
+  }
+
+  if (input == null) {
+    return [];
+  }
+
+  return [String(input).trim()].filter(Boolean);
+};
+
 export const leaveDB = {
   // 獲取所有請假申請
   getAllApplications: async (): Promise<LeaveApplication[]> => {
@@ -267,6 +308,9 @@ export const leaveDB = {
   // 創建新的請假申請
   createApplication: async (application: Omit<LeaveApplication, 'id' | 'status' | 'appliedAt' | 'is_synced'>): Promise<LeaveApplication | null> => {
     try {
+      const positionArray = normalizeStringArray(application.positionarea);
+      const authArray = normalizeStringArray(application.authposition);
+
       const result = await db.query(`
         INSERT INTO leave_applications (
           employee_id, employee_name, leave_type, start_date, end_date, reason, apply_folder_link, positionarea, authposition, RandomUniqueId
@@ -298,8 +342,8 @@ export const leaveDB = {
         application.endDate,
         application.reason,
         application.applyFolderLink,
-        application.positionarea,
-        application.authposition,
+        positionArray,
+        authArray,
         application.RandomUniqueId,
       ]);
       
