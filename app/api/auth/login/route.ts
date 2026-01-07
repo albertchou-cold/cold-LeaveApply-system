@@ -27,14 +27,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(response, { status: 500 });
     }
 
-    // 合理標準化：純數字則補零至 3 位；其他（含字母）僅做 trim
-    let memberIdCheck: string;
-    const trimmed = (userId || '').trim();
-    if (/^\d+$/.test(trimmed)) {
-      memberIdCheck = trimmed.padStart(3, '0');
-    } else {
-      memberIdCheck = trimmed; // 不強制大小寫轉換，避免與註冊時大小寫不一致
-    }
+    // 標準化：僅移除前後空白，避免自動補零造成編號不一致
+    const memberIdCheck = (userId || '').trim();
 
     // 簡單的驗證
     if (!userId || !password) {
@@ -47,7 +41,7 @@ export async function POST(request: NextRequest) {
     }
 
     // 驗證使用者 (使用 employeeId 作為 username 來查詢)
-  const user = await userDB.authenticateUser(memberIdCheck, password);
+    const user = await userDB.authenticateUser(memberIdCheck, password);
 
     if (!user) {
       const response: AuthResponse = {

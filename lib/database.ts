@@ -449,8 +449,16 @@ export const userDB = {
   // 使用者登入驗證
   authenticateUser: async (memberIdCheck: string, password: string): Promise<User | null> => {
     try {
-      const result = await db.query(`
-        SELECT 
+      const trimmedId = memberIdCheck.trim();
+      const candidateIds = new Set<string>([trimmedId]);
+
+      if (/^\d+$/.test(trimmedId)) {
+        const withoutLeadingZeros = trimmedId.replace(/^0+/, '') || '0';
+        candidateIds.add(withoutLeadingZeros);
+      }
+
+      const result = await db.query(
+        `SELECT 
           id::text,
           employee_id as "memberId",
           email,
@@ -463,8 +471,10 @@ export const userDB = {
           created_at::text as "createdAt",
           last_login_at::text as "lastLoginAt"
         FROM users 
-        WHERE employee_id = $1
-      `, [memberIdCheck]);
+        WHERE employee_id = ANY($1::text[])
+      `,
+        [Array.from(candidateIds)]
+      );
 
       if (result.rows.length === 0) {
         return null;
