@@ -310,6 +310,8 @@ export const leaveDB = {
     try {
       const positionArray = normalizeStringArray(application.positionarea);
       const authArray = normalizeStringArray(application.authposition);
+      const positionJson = JSON.stringify(positionArray);
+      const authJson = JSON.stringify(authArray);
 
       const result = await db.query(`
         INSERT INTO leave_applications (
@@ -342,8 +344,8 @@ export const leaveDB = {
         application.endDate,
         application.reason,
         application.applyFolderLink,
-        positionArray,
-        authArray,
+        positionJson,
+        authJson,
         application.RandomUniqueId,
       ]);
       

@@ -28,8 +28,8 @@ export default function LeaveForm({ onSubmit, loading }: LeaveFormProps) {
     endDate: getCurrentDateTime(),
     reason: '',
     applyFolderLink: '',
-    authposition: user?.authposition || [],
-    positionarea: user?.positionarea || []
+    authposition: typeof user?.authposition === "string" ? JSON.parse(user?.authposition || '[]') : [],
+    positionarea: typeof user?.positionarea === "string" ? JSON.parse(user?.positionarea || '[]') : []
   });
 
   const handleSubmit = (e: React.FormEvent) => {
