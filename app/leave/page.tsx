@@ -21,7 +21,12 @@ export default function LeavePage() {
     setLoading(true);
     console.log("user" , user)
     try {
-      const response = await fetch('/api/leave');
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/leave', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       if (data.success) {
         setApplications(Array.isArray(data.data) ? data.data : [data.data].filter(Boolean));

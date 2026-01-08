@@ -1,18 +1,42 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { LeaveApplicationResponse } from '@/app/types/leave';
 import { leaveDB, initializeDatabase } from '@/lib/database';
+import { getTokenFromHeader, verifyToken } from '@/lib/auth';
+import { SessionUser } from '@/app/types/auth';
 
 export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const employeeId = searchParams.get('employeeId');
+  const authHeader = request.headers.get('authorization');
+  const token = getTokenFromHeader(authHeader);
+  let sessionUser: SessionUser | null = null;
 
-    let applications;
-    if (employeeId) {
-      applications = await leaveDB.getApplicationsByEmployeeId(employeeId);
+  if (token) {
+    sessionUser = verifyToken(token);
+
+    console.log("user data  :" , sessionUser);
+    if (sessionUser) {
+      console.log('Current user in GET /leave:', sessionUser);
     } else {
-      applications = await leaveDB.getAllApplications();
+      console.warn('Invalid token supplied to GET /leave');
     }
+  } else {
+    console.warn('No authorization header supplied to GET /leave');
+  }
+
+  // 必須有 token 才能查詢
+  if (!sessionUser) {
+    const response: LeaveApplicationResponse = {
+      success: false,
+      message: '未授權，請先登入',
+      error: '缺少有效的驗證 token'
+    };
+    return NextResponse.json(response, { status: 401 });
+  }
+
+  try {
+    // 強制只能查詢登入者自己的資料
+    const employeeId = sessionUser.employeeId;
+
+    const applications = await leaveDB.getApplicationsByEmployeeId(employeeId);
 
     // 過濾掉已同步的記錄
     // const filteredApplications = applications.filter(app => !app.is_synced);
